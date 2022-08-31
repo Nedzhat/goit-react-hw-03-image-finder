@@ -9,7 +9,6 @@ export class ImageGalleryItem extends Component {
   }
 
   toggleModal = e => {
-    console.log('toggle');
     this.setState(({ showModal }) => ({
             showModal: !showModal,
     }))

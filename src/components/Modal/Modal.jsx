@@ -17,8 +17,6 @@ export class Modal extends Component {
 
     handleKeyDown = e => {
             if (e.code === 'Escape') {
-                console.log('нажал ескейп');
-                console.log(this.props);
                 this.props.onClose();
             }
         }
@@ -34,5 +32,5 @@ export class Modal extends Component {
 
 Modal.propTypes = {
     route: PropTypes.string.isRequired,
-    onToggle: PropTypes.func.isRequired,
+    onClose: PropTypes.func.isRequired,
 };

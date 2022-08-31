@@ -24,15 +24,23 @@ export class App extends Component {
 
   async componentDidUpdate(prevProps, prevState) {
     try {
-      if (prevState.searchQuery !== this.state.searchQuery) {
+      if (prevState.searchQuery !== this.state.searchQuery || prevState.page !== this.state.page) {
         this.setState({
           status: Status.PENDING,
         })
         const data = await fetchImages(this.state.searchQuery, this.state.page);
-        this.setState({
-          arrImg: data.hits,
+        if (!data) {
+          this.setState({
+            status: Status.REJECTED,
+            
+          })
+          return;
+        }
+        this.setState(prevState => ({
+          arrImg: [...prevState.arrImg, ...data.hits],
           status: Status.RESOLVED,
-        })
+        }));
+        
       }
     } catch (error) {
       console.log(error);
@@ -41,7 +49,17 @@ export class App extends Component {
     }
   
   handleSubmitForm = searchQuery => {
-    this.setState({ searchQuery });
+    this.setState({
+      searchQuery,
+      page: 1,
+      arrImg: [],
+    });
+  }
+
+  handleLoadMore = () => {
+    this.setState(prevState => ({
+      page: prevState.page + 1,
+    }))
   }
 
   render() {
@@ -50,8 +68,9 @@ export class App extends Component {
   return (<div>
     <Searchbar onSubmit={this.handleSubmitForm} />
     {arrImg.length > 0 && <ImageGallery items={arrImg} />}
-    {status === Status.RESOLVED && <Button text="Load More" />}
-    {status === Status.PENDING && <Loader/>} 
+    {status === Status.RESOLVED && <Button text="Load More" loadMore={this.handleLoadMore} />}
+    {status === Status.PENDING && <Loader />}
+    {status === Status.REJECTED && <div style={{ display: 'flex', justifyContent: 'center'}}><h1>По вашему запросу, ничего не найдено!</h1></div>}
     <ToastContainer />
   </div>);
   }
